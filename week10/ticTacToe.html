@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ticTacToe</title>
+  <style>
+    .cell {
+      width: 100px;
+      height: 100px;
+      display: inline-block;
+      vertical-align: middle;
+      text-align: center;
+      font-size: 50px;
+      line-height: 100px;
+      background-color: #eeeeee;
+      border: 1px solid #dddddd;
+    }
+  </style>
+  
+</head>
+<body>
+  
+  <div id="pannel"></div>
+  
+  
+  <script>
+    
+  let data = [
+    [0, 0, 0],
+    [0, 0, 0],
+    [0, 0, 0]
+  ];
+  
+  let color = 2;
+  
+  function show() {
+    let pannel = document.getElementById("pannel");
+    pannel.innerHTML = " ";
+    for (let y = 0; y < data.length; y++) {
+      for (let x = 0; x < data[y].length; x++) {
+        let cell = document.createElement("div");
+        cell.classList.add('cell');
+        cell.innerText = data[y][x] === 1 ? 'X' : data[y][x] === 2 ? 'O' : "";
+        cell.addEventListener("click", () => {
+          userMove(x, y)
+        });
+        pannel.appendChild(cell);
+      }
+      pannel.appendChild(document.createElement("br"))
+    }
+  }
+  
+  //绑定过多的事件不会影响性能，触发过多才会影响
+  function userMove(x, y) {
+    //防止重复点击
+    if (data[y][x] !== 0)
+      return;
+    color = 3 - color;
+    data[y][x] = color;
+    if (check(data, color)) {
+      console.log((color == 1 ? "X" : "O") + ' is winner!')
+    }
+    show();
+    computedMove()
+  }
+  
+  function computedMove() {
+    let choice = bestChoice(data, color);
+    color = 3 - color;
+    if (choice.point)
+      data[choice.point[1]][choice.point[0]] = color;
+    if (check(data, color)) {
+      console.log((color == 1 ? "X" : "O") + ' is winner!')
+    }
+    show()
+  }
+  
+  function check(data, color) {
+    //三横，三纵，两条对角线
+    for (let y = 0; y < 3; y++) {
+      let win = true;
+      for (let x = 0; x < 3; x++) {
+        if (data[y][x] !== color) {
+          win = false;
+          break;
+        }
+      }
+      if (win)
+        return true
+    }
+  
+    for (let y = 0; y < 3; y++) {
+      let win = true;
+      for (let x = 0; x < 3; x++) {
+        if (data[x][y] !== color) {
+          win = false;
+          break;
+        }
+      }
+      if (win)
+        return true
+    }
+  
+    for (let y = 0; y < 3; y++) {
+      let win = true;
+      for (let x = 0; x < 3; x++) {
+        if (data[x][x] !== color) {
+          win = false;
+          break;
+        }
+      }
+      if (win)
+        return true
+    }
+  
+    for (let y = 0; y < 3; y++) {
+      let win = true;
+      for (let x = 0; x < 3; x++) {
+        if (data[x][2 - x] !== color) {
+          win = false;
+          break;
+        }
+      }
+      if (win)
+        return true
+    }
+  
+    return false
+  }
+  
+  function clone(data) {
+    return JSON.parse(JSON.stringify(data))
+  }
+  
+  function willWin(data, color) {
+    for (let y = 0; y < 3; y++) {
+      for (let x = 0; x < 3; x++) {
+        if (data[y][x] !== 0)
+          continue;
+        let tmp = clone(data);
+        tmp[y][x] = color;
+        if (check(tmp, color)) {
+          return [x, y]
+        }
+      }
+    }
+    return null
+  }
+  
+  function bestChoice(data, color) {
+    let point = willWin(data, color);
+    if (point) {
+      return {
+        point: point,
+        result: 1
+      }
+    }
+    let result = -1;
+    for (let y = 0; y < 3; y++) {
+      for (let x = 0; x < 3; x++) {
+        if (data[y][x] !== 0)
+          continue;
+        let tmp = clone(data);
+        tmp[y][x] = color;
+        let opp = bestChoice(tmp, 3 - color);
+        if (-opp.result >= result) {
+          point = [x, y];
+          result = -opp.result
+        }
+      }
+    }
+    return {
+      point: point,
+      result: point ? result : 0
+    }
+  }
+  
+  show();
+  
+  </script>
+</body>
+
+</html>

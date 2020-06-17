@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>reverseDom</title>
+</head>
+<body>
+    <div id="box">
+        <span>333</span>
+        <p>555</p>
+        <a href="">2</a>
+        <div>fff</div>
+    </div>
+</body>
+
+<script>
+    let boxElement = document.getElementById('box');
+
+    function reverseChildren(element) {
+        let range = new Range();
+        range.selectNodeContents(element);
+        
+        let fragment = range.extractContents();
+        let l = fragment.childNodes.length;
+
+        while (l-- > 0) {
+            fragment.appendChild(fragment.childNodes[l]);
+        }
+
+        element.appendChild(fragment);
+    }
+
+    reverseChildren(boxElement);
+</script>
+</html>
